@@ -1,6 +1,12 @@
 public class Computadora implements DispositivoElectronico{
+    private String marca;
     private boolean estado = true;
     
+    public Computadora(String marca, boolean estado) {
+        this.marca = marca;
+        this.estado = estado;
+    }
+
     @Override
     public void setEstado(boolean estado) {
         this.estado = estado;
