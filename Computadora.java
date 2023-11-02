@@ -32,4 +32,12 @@ public class Computadora implements DispositivoElectronico{
             return "Está apagado";
         }
     }
+
+    public String getMarca() {
+        return marca;
+    }
+
+    public void setMarca(String marca) {
+        this.marca = marca;
+    }
 }
