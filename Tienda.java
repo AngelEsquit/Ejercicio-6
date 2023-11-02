@@ -5,12 +5,11 @@ Ejercicio 6
 */
 
 import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Comparator;
 import java.util.Scanner;
 import java.util.InputMismatchException;
 import java.io.BufferedReader;
 import java.io.FileReader;
+import java.io.FileWriter;
 import java.io.IOException;
 
 public class Tienda {
@@ -27,6 +26,10 @@ public class Tienda {
         String marca = "";
         String modelo = "";
         boolean estado = true;
+        int num_telefonos = 0;
+        int num_computadoras = 0;
+        int num = 0;
+
 
         // Variable para saltar la primera fila de encabezados
         boolean primera_fila = true;
@@ -48,11 +51,9 @@ public class Tienda {
                         switch (conteo) {
                             case 0: // ID
                                 id = Integer.parseInt(datos);
-                                System.out.println(id);
                                 break;
                             case 1: // Modelo
                                 modelo = datos;
-                                System.out.println(modelo);
                                 break;
                             case 2: // Estado
                                 if (Integer.parseInt(datos) == 1) {
@@ -62,8 +63,6 @@ public class Tienda {
                                 else if (Integer.parseInt(datos) == 0) {
                                     estado = false;
                                 }
-
-                                System.out.println(estado);
                                 break;
                             default:
                                 break;
@@ -99,11 +98,9 @@ public class Tienda {
                         switch (conteo) {
                             case 0: // ID
                                 id = Integer.parseInt(datos);
-                                System.out.println(id);
                                 break;
                             case 1: // Marca
                                 marca = datos;
-                                System.out.println(id);
                                 break;
                             case 2: // Estado
                                 if (Integer.parseInt(datos) == 1) {
@@ -113,8 +110,6 @@ public class Tienda {
                                 else if (Integer.parseInt(datos) == 0) {
                                     estado = false;
                                 }
-
-                                System.out.println(estado);
                                 break;
                             default:
                                 break;
@@ -129,8 +124,6 @@ public class Tienda {
         } catch (IOException e) { // Catch para errores al leer el CSV
             System.err.println("Error al leer el archivo CSV: " + e.getMessage());
         }
-
-        System.out.println(dispositivos.size());
 
         while (salir) {
             printMenu();
@@ -172,12 +165,126 @@ public class Tienda {
                     }
                     break;
                 case 3:
-                    salir = false;
-                    System.out.println("// Salir del bucle");
+                    preguntarTipo();
+
+                    try {
+                        opcion = scanner.nextInt();
+                        scanner.nextLine();
+                    } catch (InputMismatchException e) {
+                        System.out.println("");
+                        System.out.println("Ingrese un número.");
+                        scanner.nextLine();
+                    }
+
+                    switch (opcion) {
+                        case 1:
+                            System.out.println("Ingrese el modelo");
+                            modelo = scanner.nextLine();
+                            System.out.println("Ingrese el estado");
+                            System.out.println("1: Encendido");
+                            System.out.println("2: Apagado");
+                            num = scanner.nextInt();
+                            scanner.nextLine();
+                            switch (num) {
+                                case 1:
+                                    estado = true;
+                                    dispositivos.add(new Telefono(modelo, estado));
+                                    break;
+                                case 2:
+                                    estado = false;
+                                    dispositivos.add(new Telefono(modelo, estado));
+                                    break;
+                                default:
+                                    System.out.println("");
+                                    System.out.println("Número inválido. Intente nuevamente.");
+                                    break;
+                            }
+                            break;
+                        case 2:
+                            System.out.println("Ingrese la marca");
+                            modelo = scanner.nextLine();
+                            System.out.println("Ingrese el estado");
+                            System.out.println("1: Encendido");
+                            System.out.println("2: Apagado");
+                            num = scanner.nextInt();
+                            scanner.nextLine();
+                            switch (num) {
+                                case 1:
+                                    estado = true;
+                                    dispositivos.add(new Computadora(marca, estado));
+                                case 2:
+                                    estado = false;
+                                    dispositivos.add(new Computadora(marca, estado));
+                                default:
+                                    System.out.println("");
+                                    System.out.println("Número inválido. Intente nuevamente.");
+                                    break;
+                            }
+                            break;
+                        case 0:
+                            continue;
+                        default:
+                            System.out.println("");
+                            System.out.println("Número inválido. Intente nuevamente.");
+                            break;
+                    }
+
                     break;
                 case 4:
+                    String csvFilePath2 = "telefonos.csv"; // Establecer el archivo CSV
+
+                    try (FileWriter writer = new FileWriter(csvFilePath2)) {
+                        writer.append("id;modelo;estado\n"); // Escribir encabezados
+
+                        for (DispositivoElectronico dispositivo : dispositivos) { // Escribir cada dispositivo en una nueva fila
+                            if (dispositivo instanceof Telefono) {
+                                Telefono telefono = (Telefono) dispositivo;
+                                if (telefono.getEstado() == true) {
+                                    writer.append(num_telefonos + ";" + telefono.getModelo() + ";1" + "\n");
+                                }
+
+                                else if (telefono.getEstado() == false) {
+                                    writer.append(num_telefonos + ";" + telefono.getModelo() + ";0" + "\n");
+                                }
+                            }
+                            num_telefonos += 1;
+                        }     
+                        System.out.println("");       
+                        System.out.println("Datos guardados en " + csvFilePath2);
+                    }
+                    
+                    catch (IOException e) { // Catch para errores al guardar el CSV
+                        System.err.println("Error al guardarTelefono el archivo CSV: " + e.getMessage());
+                    }
+
+                    String csvFilePath3 = "computadoras.csv"; // Establecer el archivo CSV
+
+                    try (FileWriter writer = new FileWriter(csvFilePath3)) {
+                        writer.append("id;marca;estado\n"); // Escribir encabezados
+
+                        for (DispositivoElectronico dispositivo : dispositivos) { // Escribir cada dispositivo en una nueva fila
+                            if (dispositivo instanceof Computadora) {
+                                Computadora computadora = (Computadora) dispositivo;
+                                if (computadora.getEstado() == true) {
+                                    writer.append(num_computadoras + ";" + computadora.getMarca() + ";1" + "\n");
+                                }
+
+                                else if (computadora.getEstado() == false) {
+                                    writer.append(num_computadoras + ";" + computadora.getMarca() + ";0" + "\n");
+                                }
+                            }
+                            num_computadoras += 1;
+                        }     
+                        System.out.println("");       
+                        System.out.println("Datos guardados en " + csvFilePath3);
+                    }
+                    
+                    catch (IOException e) { // Catch para errores al guardar el CSV
+                        System.err.println("Error al guardar el archivo CSV: " + e.getMessage());
+                    }
+
                     salir = false;
-                    System.out.println("// Salir del bucle");
+                    System.out.println("Hasta pronto :)");
                     break;
                 case 0:
                     continue;
@@ -204,7 +311,7 @@ public class Tienda {
         System.out.println("");
     }
 
-    public static void printMenu() {
+    public static void preguntarTipo() {
         System.out.println("");
         System.out.println("Ingrese la opción que desee:");
         System.out.println("1: Teléfono");
